@@ -1,0 +1,55 @@
+#tahapan
+data<-read.csv(file.choose(),header = TRUE)
+str(data)
+
+hist(data$transaction3month)
+
+data$transaction3month <- (data$transaction3month- min(data$transaction3month))/(max(data$transaction3month) - min(data$transaction3month))
+hist(data$transaction3month)
+data$rank <- (data$rank - min(data$rank))/(max(data$rank) - min(data$rank))
+
+set.seed(222)
+ind <- sample(2, nrow(data), replace = TRUE, prob = c(0.7, 0.3))
+training <- data[ind==1,]
+testing <- data[ind==2,]
+
+library(neuralnet)
+set.seed(333)
+
+n <- neuralnet(output~ transaction3month+rank,
+	data = training,
+	hidden = 1,
+	err.fct ="ce",
+	linear.output = FALSE)
+plot(n)
+
+output<-compute(n, training[,-1])
+output
+
+head(output$net.result)
+head(training[1,])
+
+#node4
+in4 <- 2.98559 + (5.00308*0.75)+(1.01711*1)+(4.34614*0.03333333)
+in4
+out4 <- 1/(1+exp(-in4))
+out4
+
+in5 <- 2.27404 + (3.53084*out4)
+in5
+out5 <- 1/(1+exp(-in5))
+out5
+
+#node4
+in4 <- 0.68559 + (2.70308*1)+(-1.28289*1)
+in4
+out4 <- 1/(1+exp(-in4))
+out4
+
+in5 <- 4.37774 + (2.57404*out4)
+in5
+
+[1] 6.672403
+
+out5 <- 1/(1+exp(-in5))
+out5
